@@ -1,4 +1,4 @@
-# Sentinel — Minimal LLM Validation Framework
+# Sentinel — Modular LLM Validation Framework
 
 **Project**
 
