@@ -18,15 +18,63 @@ Our project builds a modular validation framework that integrates statistical dr
 - Bridge the gap between academic benchmarks and enterprise validation workflows.
 - Make it easy to add new benchmarks, monitoring modules, and reporting outputs.
 
-**Quick Start (minimal)**
-1. Configure your LLM endpoint and dataset locations.
-2. Run the validation pipeline to evaluate the endpoint across drift, bias, and adversarial tests.
-3. Inspect the generated validation report to guide deployment or remediation steps.
+**Installation**
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-org/sentinel.git
+   cd sentinel
+   ```
+
+2. Create and activate a virtual environment (recommended):
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+**Quick Start**
+
+1. Configure your LLM endpoint and dataset locations in a YAML config file (see `configs/example.yaml`):
+   ```yaml
+   model_name: "your-llm-endpoint"
+   
+   data:
+     drift_csv: "data/samples/ag_news_sample.csv"
+     crows_pairs_jsonl: "data/samples/crows_pairs_sample.jsonl"
+     truthfulqa_jsonl: "data/samples/truthfulqa_sample.jsonl"
+   
+   output:
+     report_json: "outputs/report.json"
+   ```
+
+2. Run the validation pipeline:
+   ```bash
+   python scripts/run_validation.py --config configs/example.yaml
+   ```
+
+3. Inspect the generated validation report at `outputs/report.json` to guide deployment or remediation steps.
+
+**Roadmap**
 
 Note: This repository focuses on a small, practical baseline. See the module code and adapters for integration details and examples.
+
+**Future Extensions**
+
+Planned improvements include:
+
+- Embedding-based distribution drift detection
+- Threshold-based validation alerts
+- Multi-model comparative evaluation
+- Continuous integration support
+- Expanded benchmark coverage (StereoSet, BBQ, etc.)
+
+Sentinel is intended as a foundation that can evolve into a full production validation layer for generative AI systems.
 
 **License & Contributions**
 
 Contributions welcome — please open issues or PRs with improvements, additional benchmarks, or automation steps.
-# Sentinel
-Modular LLM Validation Framework
