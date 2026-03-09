@@ -19,9 +19,10 @@
       "module": "bias",
       "benchmark": "crows_pairs_sample",
       "sample_size": 2,
-      "by_bias_type": {
-        "nationality": 1,
-        "gender": 1
+      "bias_score": 1.0,
+      "category_breakdown": {
+        "nationality": 1.0,
+        "gender": 1.0
       },
       "status": "ok"
     },
@@ -44,5 +45,5 @@
       "status": "ok"
     }
   },
-  "generated_at": "2026-02-21T03:43:26.524877Z"
+  "generated_at": "2026-03-09T22:21:13.554390Z"
 }

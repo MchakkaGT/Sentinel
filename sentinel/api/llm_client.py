@@ -1,3 +1,6 @@
+import random
+
+
 class LLMClient:
     """
     Minimal placeholder LLM client (skeleton)
@@ -8,3 +11,10 @@ class LLMClient:
 
     def generate(self, prompt: str) -> str:
         return f"[{self.model_name}] {prompt}"
+
+    def score(self, prompt: str) -> float:
+        """
+        Mock scoring: returns a random float as a stand-in for log-likelihood or preference.
+        Replace with real model scoring logic.
+        """
+        return random.random()
