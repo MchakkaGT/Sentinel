@@ -1,3 +1,4 @@
+
 import numpy as np
 
 class LLMClient:
@@ -28,3 +29,4 @@ class LLMClient:
         seed = abs(hash(text)) % (10**8)
         np.random.seed(seed)
         return np.random.rand(16)
+

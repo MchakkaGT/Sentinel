@@ -59,6 +59,20 @@ Our project builds a modular validation framework that integrates statistical dr
 
 3. Inspect the generated validation report at `outputs/report.json` to guide deployment or remediation steps.
 
+---
+
+## Bias Evaluation (CrowS-Pairs)
+
+This module measures language model bias using the CrowS-Pairs dataset:
+- Loads sentence pairs (stereotypical vs. anti-stereotypical) from JSONL.
+- Scores both sentences with the model.
+- Computes how often the model prefers the stereotypical sentence (overall and by bias type).
+- Results are included in the main validation report.
+
+To test just the bias module logic, see `sentinel/bias/test_bias_module.py`.
+
+---
+
 **Roadmap**
 
 Note: This repository focuses on a small, practical baseline. See the module code and adapters for integration details and examples.
