@@ -1,0 +1,22 @@
+# Virtual environment
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDEs and OS files
+.vscode/
+.idea/
+.DS_Store
+**/.DS_Store
+
+# Type checking
+.mypy_cache/
+.pyrightpy/
+
+# Local outputs/logs
+outputs/
+*.log
