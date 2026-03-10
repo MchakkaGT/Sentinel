@@ -93,6 +93,27 @@ To test just the bias module logic, see `sentinel/bias/test_bias_module.py`.
 
 ---
 
+## Adversarial Robustness Testing (TruthfulQA)
+
+This module evaluates model robustness against adversarial prompting using a sample version of the TruthfulQA benchmark.
+
+- Loads question prompts from a TruthfulQA-style JSONL dataset.
+- Generates multiple prompt variants for each question, including:
+  - the original prompt (base), misleading prefix prompts, confident rephrasing prompts, contradictory contextual prompts
+- Sends each variant through the model interface to collect responses.
+- Applies a baseline truthfulness scoring heuristic by comparing generated outputs to reference answers.
+
+The module reports several metrics in the validation report, including:
+
+- **Overall truth accuracy** across all prompt variants
+- **Robust accuracy** measuring correctness under adversarial prompts only
+- **Variant-level accuracy** showing how different prompt perturbations affect model behavior
+- **Example-level outputs** containing prompts, generated responses, and truth scores
+
+Results are included in the main validation report under the `adversarial` module.
+
+---
+
 **Roadmap**
 
 Note: This repository focuses on a small, practical baseline. See the module code and adapters for integration details and examples.
