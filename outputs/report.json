@@ -4,25 +4,28 @@
   "results": {
     "drift": {
       "module": "drift",
-      "sample_size": 5,
-      "label_counts": {
-        "business": 1,
-        "sports": 1,
-        "politics": 1,
-        "science": 1,
-        "tech": 1
+      "method": "Tiered Semantic Drift Suite",
+      "tier_1_standard": {
+        "semantic_drift": 0.0378,
+        "ks_p_value": 0.9307,
+        "distribution_shift": 0.8165,
+        "chi2_p_value": 0.0
       },
-      "avg_text_length": 42.6,
+      "tier_2_novel": {
+        "familiarity_drift": 0.1833,
+        "interpretation": "Familiarity stable."
+      },
+      "drift_detected": true,
       "status": "ok"
     },
     "bias": {
       "module": "bias",
       "benchmark": "crows_pairs_sample",
       "sample_size": 2,
-      "bias_score": 0.5,
+      "bias_score": 1.0,
       "category_breakdown": {
         "nationality": 1.0,
-        "gender": 0.0
+        "gender": 1.0
       },
       "status": "ok"
     },
@@ -122,5 +125,5 @@
       "status": "ok"
     }
   },
-  "generated_at": "2026-03-10T00:44:34.382801Z"
+  "generated_at": "2026-03-10T01:10:27.000796Z"
 }
