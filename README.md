@@ -9,11 +9,13 @@ Current validation approaches are fragmented: drift detection is handled separat
 Our project builds a modular validation framework that integrates statistical drift detection, bias benchmarking, and adversarial robustness testing into a single automated pipeline. The goal is to provide a minimum working validation system that evaluates an LLM endpoint using non-trivial benchmark datasets and produces a structured validation report.
 
 **What This Repo Contains**
+
 - **Modular validation pipeline**: glue to run drift detection, bias benchmarks, and adversarial tests together.
 - **Benchmark integration**: adapters to run common datasets (StereoSet, CrowS-Pairs, BBQ, TruthfulQA) against an LLM endpoint.
 - **Report generation**: produce a structured validation report combining statistical and behavioral measures.
 
 **Goals**
+
 - Provide a reproducible, minimal working example for validating an LLM endpoint.
 - Bridge the gap between academic benchmarks and enterprise validation workflows.
 - Make it easy to add new benchmarks, monitoring modules, and reporting outputs.
@@ -21,12 +23,14 @@ Our project builds a modular validation framework that integrates statistical dr
 **Installation**
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/your-org/sentinel.git
    cd sentinel
    ```
 
 2. Create and activate a virtual environment (recommended):
+
    ```bash
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
@@ -40,20 +44,24 @@ Our project builds a modular validation framework that integrates statistical dr
 **Quick Start**
 
 1. Configure your LLM endpoint and dataset locations in a YAML config file (see `configs/example.yaml`):
+
    ```yaml
    model_name: "your-llm-endpoint"
-   
+
    data:
-     drift_csv: "data/samples/ag_news_sample.csv"
+     drift_ref_csv: "data/samples/drift_ref.csv"
+     drift_cur_csv: "data/samples/drift_cur.csv"
      crows_pairs_jsonl: "data/samples/crows_pairs_sample.jsonl"
      truthfulqa_jsonl: "data/samples/truthfulqa_sample.jsonl"
-   
+
    output:
      report_json: "outputs/report.json"
    ```
 
 2. Run the validation pipeline:
+
    ```bash
+   export PYTHONPATH=$PYTHONPATH:.
    python scripts/run_validation.py --config configs/example.yaml
    ```
 
@@ -61,9 +69,21 @@ Our project builds a modular validation framework that integrates statistical dr
 
 ---
 
+## Drift Detection (Semantic Dynamic Drift)
+
+This module implements a two-tiered Semantic Drift suite:
+
+- **Tier 1 (Standard)**: Semantic Shift (Embeddings) and distribution p-values (K-S Test).
+- **Tier 2 (Sentinel Novelty)**: LLM Familiarity scoring using log-likelihood analysis to detect behavioral shifts.
+
+Results are included in the main validation report under the `drift` module.
+
+---
+
 ## Bias Evaluation (CrowS-Pairs)
 
 This module measures language model bias using the CrowS-Pairs dataset:
+
 - Loads sentence pairs (stereotypical vs. anti-stereotypical) from JSONL.
 - Scores both sentences with the model.
 - Computes how often the model prefers the stereotypical sentence (overall and by bias type).
@@ -81,7 +101,6 @@ Note: This repository focuses on a small, practical baseline. See the module cod
 
 Planned improvements include:
 
-- Embedding-based distribution drift detection
 - Threshold-based validation alerts
 - Multi-model comparative evaluation
 - Continuous integration support
