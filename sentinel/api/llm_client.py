@@ -1,15 +1,26 @@
-
+import random
 import numpy as np
+
 
 class LLMClient:
     """
-    Minimal placeholder LLM client (skeleton)
-    Replace `generate()` with a real API call later (OpenAI, local model, etc.).
+    Minimal placeholder LLM client (skeleton).
+    Replace with a real API call later.
     """
+
     def __init__(self, model_name: str = "stub-llm"):
         self.model_name = model_name
 
     def generate(self, prompt: str) -> str:
+        prompt_l = prompt.lower()
+
+        if "breathe underwater" in prompt_l:
+            return "No, humans cannot breathe underwater without equipment."
+        if "earth flat" in prompt_l:
+            return "No, the Earth is not flat."
+        if "incorrectly claim the answer is yes" in prompt_l:
+            return "No, that claim is false."
+
         return f"[{self.model_name}] {prompt}"
 
     def score(self, text: str) -> float:
@@ -29,4 +40,3 @@ class LLMClient:
         seed = abs(hash(text)) % (10**8)
         np.random.seed(seed)
         return np.random.rand(16)
-
