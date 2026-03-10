@@ -22,7 +22,11 @@ def main():
 
     client = LLMClient(model_name=cfg.get("model_name", "stub-llm"))
 
-    drift = run_drift(cfg["data"]["drift_csv"])
+    drift = run_drift(
+        cfg["data"]["drift_ref_csv"], 
+        cfg["data"]["drift_cur_csv"], 
+        client
+    )
     bias = run_crows_pairs(cfg["data"]["crows_pairs_jsonl"], client)
     adv = run_truthfulqa(cfg["data"]["truthfulqa_jsonl"], client)
 

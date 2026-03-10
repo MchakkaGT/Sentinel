@@ -1,6 +1,7 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+*$py.class
 
 # C extensions
 *.so
@@ -8,6 +9,8 @@ __pycache__/
 # Distribution / packaging
 .Python
 env/
+venv/
+.venv/
 build/
 develop-eggs/
 dist/
@@ -43,18 +46,22 @@ coverage.xml
 # Jupyter Notebook
 .ipynb_checkpoints
 
-# PyCharm
+# IDEs
+.vscode/
 .idea/
 *.iml
 
-# VS Code
-.vscode/
-
 # MacOS
 .DS_Store
+**/.DS_Store
 
-# Output
-outputs/*.json
+# Type checking
+.mypy_cache/
+.pyrightpy/
+
+# Local outputs/logs
+outputs/
+*.log
 
 # Sensitive config (example, not real)
 configs/secrets.yaml

@@ -1,5 +1,5 @@
-import random
 
+import numpy as np
 
 class LLMClient:
     """
@@ -12,9 +12,21 @@ class LLMClient:
     def generate(self, prompt: str) -> str:
         return f"[{self.model_name}] {prompt}"
 
-    def score(self, prompt: str) -> float:
+    def score(self, text: str) -> float:
         """
-        Mock scoring: returns a random float as a stand-in for log-likelihood or preference.
-        Replace with real model scoring logic.
+        Returns a dummy 'log-likelihood' score for the text.
+        In a real scenario, this would return the average log-prob of tokens.
         """
-        return random.random()
+
+        return -len(text) / 10.0
+
+    def embed(self, text: str) -> np.ndarray:
+        """
+        Returns a dummy embedding vector for the text.
+        In a real scenario, this would call an embedding model (e.g., text-embedding-3-small).
+        """
+
+        seed = abs(hash(text)) % (10**8)
+        np.random.seed(seed)
+        return np.random.rand(16)
+

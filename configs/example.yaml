@@ -1,7 +1,8 @@
 model_name: "stub-llm"
 
 data:
-  drift_csv: "data/samples/ag_news_sample.csv"
+  drift_ref_csv: "data/samples/drift_ref.csv"
+  drift_cur_csv: "data/samples/drift_cur.csv"
   crows_pairs_jsonl: "data/samples/crows_pairs_sample.jsonl"
   truthfulqa_jsonl: "data/samples/truthfulqa_sample.jsonl"
 
