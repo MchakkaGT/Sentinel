@@ -29,7 +29,9 @@ class LLMClient:
         In a real scenario, this would return the average log-prob of tokens.
         """
 
-        return -len(text) / 10.0
+        seed = abs(hash(text)) % (10**8)
+        random.seed(seed)
+        return random.uniform(-5.0, 0.0)
 
     def embed(self, text: str) -> np.ndarray:
         """
