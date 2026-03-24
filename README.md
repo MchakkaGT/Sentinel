@@ -71,12 +71,25 @@ Our project builds a modular validation framework that integrates statistical dr
 
 ## Drift Detection (Semantic Dynamic Drift)
 
-This module implements a two-tiered Semantic Drift suite:
+Sentinel implements a three-tiered **Semantic Dynamic Drift (SDD)** suite designed specifically for LLM workflows:
 
-- **Tier 1 (Standard)**: Semantic Shift (Embeddings) and distribution p-values (K-S Test).
-- **Tier 2 (Sentinel Novelty)**: LLM Familiarity scoring using log-likelihood analysis to detect behavioral shifts.
+- **Tier 1 (Standard)**: Semantic Centroid Shift and statistical $p$-values (Kolmogorov-Smirnov Test).
+- **Tier 2 (Distribution)**: **Maximum Mean Discrepancy (MMD)** with RBF kernels to detect subtle shifts in embedding topology that centroid-based methods miss.
+- **Tier 3 (Sentinel Novelty)**: **Familiarity Drift (Surprise)** measuring shifts in LLM log-likelihood/perplexity to identify data the model is "less familiar" with.
 
-Results are included in the main validation report under the `drift` module.
+### Drift Categorization
+The module automatically categorizes detected drift into actionable types:
+- **Covariate Shift**: Significant change in the input text distribution.
+- **Prior Probability Shift**: Significant change in label/category prevalence.
+- **Familiarity Drift**: Out-of-Distribution (OOD) data that surprises the model.
+
+### Real-World Benchmarking (AG News)
+Sentinel includes built-in support for the **AG News Dataset** to simulate real-world drift scenarios. You can run the comprehensive benchmark suite to verify detection accuracy across 5 distinct drift types:
+
+```bash
+export PYTHONPATH=$PYTHONPATH:.
+python3 scripts/benchmark_drift.py
+```
 
 ---
 
