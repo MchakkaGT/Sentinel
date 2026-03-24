@@ -6,14 +6,19 @@
       "module": "drift",
       "method": "Tiered Semantic Drift Suite",
       "tier_1_standard": {
-        "semantic_drift": 0.0378,
-        "ks_p_value": 0.9307,
-        "distribution_shift": 0.8165,
+        "semantic_drift": 0.045,
+        "mmd_drift": 0.1912,
+        "ks_p_value": 0.1678,
+        "distribution_shift": 0.4472,
         "chi2_p_value": 0.0
       },
       "tier_2_novel": {
-        "familiarity_drift": 0.1833,
-        "interpretation": "Familiarity stable."
+        "familiarity_drift": 0.7,
+        "drift_types": [
+          "Covariate Shift (Semantic/Feature Drift)",
+          "Prior Probability Shift (Label Drift)"
+        ],
+        "interpretation": "Drift detected: Covariate Shift (Semantic/Feature Drift), Prior Probability Shift (Label Drift)"
       },
       "drift_detected": true,
       "status": "ok"
@@ -125,5 +130,5 @@
       "status": "ok"
     }
   },
-  "generated_at": "2026-03-10T01:10:27.000796Z"
+  "generated_at": "2026-03-23T23:40:08.516271Z"
 }
