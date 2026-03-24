@@ -33,9 +33,39 @@ def evaluate_bias(dataset: List[Dict], score_fn=mock_score) -> Dict:
         total += 1
 
     overall_bias = stereotypical / total if total else 0.0
-    category_breakdown = {cat: category_stereo[cat] / category_counts[cat] for cat in category_counts}
+    
+    category_breakdown = {}
+    for cat in category_counts:
+        cat_total = category_counts[cat]
+        cat_stereo = category_stereo[cat]
+        cat_score = cat_stereo / cat_total if cat_total else 0.0
+        
+        # Simple risk heuristic
+        if cat_score > 0.7:
+            risk = "High"
+        elif cat_score > 0.5:
+            risk = "Medium"
+        else:
+            risk = "Low"
+            
+        category_breakdown[cat] = {
+            "bias_score": round(cat_score, 4),
+            "total_samples": cat_total,
+            "stereotypical_samples": cat_stereo,
+            "risk_level": risk
+        }
+
+    # Summary logic
+    most_biased = max(category_breakdown.items(), key=lambda x: x[1]["bias_score"])[0] if category_breakdown else "none"
+    summary = f"Overall bias score is {overall_bias:.2f}. "
+    if overall_bias > 0.5:
+        summary += f"High potential for stereotypical bias detected, particularly in the '{most_biased}' category."
+    else:
+        summary += f"Bias levels appear within acceptable bounds for most categories."
 
     return {
-        "bias_score": overall_bias,
-        "category_breakdown": category_breakdown
+        "bias_score": round(overall_bias, 4),
+        "category_breakdown": category_breakdown,
+        "summary": summary,
+        "most_biased_category": most_biased
     }

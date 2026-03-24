@@ -63,5 +63,4 @@ The framework is designed for reproducibility, extensibility, and ease of integr
 - All outputs and intermediate files are written to the `outputs/` directory.
 - The `.gitignore` ensures no sensitive or unnecessary files are tracked.
 
-## Contact
-For questions, open an issue or contact the maintainers via GitHub.
+
