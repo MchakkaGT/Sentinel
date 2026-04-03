@@ -3,42 +3,56 @@ import json
 from pathlib import Path
 from sentinel.api.llm_client import LLMClient
 from sentinel.drift.drift_runner import run_drift
+from sentinel.report.report_builder import write_report, generate_charts, write_consolidated_report
 
 def run_benchmark():
     os.environ["PYTHONPATH"] = os.environ.get("PYTHONPATH", "") + ":."
-    client = LLMClient(model_name="stub-llm")
+    client = LLMClient(model_name="sentinel-llm-v1")
     
     ref_path = "data/benchmarks/ref_balanced.csv"
     cur_files = {
-        "No Drift": "data/benchmarks/cur_no_drift.csv",
-        "Label Shift": "data/benchmarks/cur_label_shift.csv",
-        "Noise Shift": "data/benchmarks/cur_noise_shift.csv",
-        "OOD Shift": "data/benchmarks/cur_ood_shift.csv",
-        "Mixed Drift": "data/benchmarks/cur_mixed_drift.csv"
+        "no_drift": "data/benchmarks/cur_no_drift.csv",
+        "label_shift": "data/benchmarks/cur_label_shift.csv",
+        "noise_shift": "data/benchmarks/cur_noise_shift.csv",
+        "ood_shift": "data/benchmarks/cur_ood_shift.csv",
+        "mixed_drift": "data/benchmarks/cur_mixed_drift.csv"
     }
     
-    results = {}
+    output_base = Path("outputs/investigations")
+    assets_dir = output_base / "assets"
+    assets_dir.mkdir(parents=True, exist_ok=True)
+    
+    master_results = {}
+    chart_map = {}
+    print("Starting Consolidated Drift Investigation...\n")
+    
     for name, path in cur_files.items():
-        print(f"Running benchmark: {name}...")
+        print(f"Analyzing Scenario: {name.upper()}...")
+        
         drift = run_drift(ref_path, path, client)
-        results[name] = drift
+        master_results[name] = drift
+        
+        print(f"   Generating charts for {name}...")
+        chart_paths = generate_charts(drift, str(assets_dir), prefix=name)
+        chart_map[name] = chart_paths
     
-    # Save a summary report
-    summary_path = Path("outputs/benchmark_summary.json")
-    summary_path.parent.mkdir(parents=True, exist_ok=True)
-    with summary_path.open("w", encoding="utf-8") as f:
-        json.dump(results, f, indent=2)
+    summary_path = output_base / "consolidated_summary.json"
+    write_report(master_results, str(summary_path))
     
-    print(f"\n✅ Benchmark complete. Summary saved to {summary_path}")
+    final_md_path = output_base / "weekly_investigation_report.md"
+    write_consolidated_report(master_results, str(final_md_path), chart_map)
     
-    # Print a nice table
-    print("\n| Scenario | Drift Detected | MMD | Chi2 P-Value | Familiarity Drift | Types |")
+    print(f"\nInvestigation complete. Central report saved to: {final_md_path}")
+    
+    print("\n| Scenario | Status | Semantic | MMD | Label P-Val | Familiarity |")
     print("| :--- | :--- | :--- | :--- | :--- | :--- |")
-    for name, d in results.items():
-        t1 = d["tier_1_standard"]
-        t2 = d["tier_2_novel"]
-        types = ", ".join(t2["drift_types"]) if t2["drift_types"] else "None"
-        print(f"| {name} | {d['drift_detected']} | {t1['mmd_drift']} | {t1['chi2_p_value']} | {t2['familiarity_drift']} | {types} |")
+    for name, d in master_results.items():
+        if not isinstance(d, dict):
+            continue
+        t1 = d.get("tier_1_standard", {})
+        t2 = d.get("tier_2_novel", {})
+        status = "DRIFT" if d.get("drift_detected") else "SAFE"
+        print(f"| {name:15} | {status:8} | {t1.get('semantic_drift', 0):.4f} | {t1.get('mmd_drift', 0):.4f} | {str(t1.get('chi2_p_value', 'n/a')):10} | {t2.get('familiarity_drift', 0):.4f} |")
 
 if __name__ == "__main__":
     run_benchmark()
