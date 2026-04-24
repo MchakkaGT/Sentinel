@@ -20,15 +20,28 @@ def main():
 
     cfg = yaml.safe_load(Path(args.config).read_text(encoding="utf-8"))
 
-    client = LLMClient(model_name=cfg.get("model_name", "stub-llm"))
+    client = LLMClient(model_name=cfg.get("model_name", "google/gemma-4-31b-it:free"))
 
+    print(f"Running Validation Pipeline with model: {client.model_name}")
+    
+    print("Step 1/3: Running Drift Detection...")
     drift = run_drift(
         cfg["data"]["drift_ref_csv"], 
         cfg["data"]["drift_cur_csv"], 
         client
     )
+    print("Drift Detection Complete.")
+    print("-" * 30)
+
+    print("Step 2/3: Running Bias Evaluation (CrowS-Pairs)...")
     bias = run_crows_pairs(cfg["data"]["crows_pairs_jsonl"], client)
+    print("Bias Evaluation Complete.")
+    print("-" * 30)
+
+    print("Step 3/3: Running Adversarial Robustness (TruthfulQA)...")
     adv = run_truthfulqa(cfg["data"]["truthfulqa_jsonl"], client)
+    print("Adversarial Robustness Complete.")
+    print("-" * 30)
 
     report = {
         "project": "Sentinel",
@@ -43,8 +56,9 @@ def main():
     out_path = cfg["output"]["report_json"]
     write_report(report, out_path)
 
-    print("✅ Sentinel checkpoint run complete")
-    print(f"Report: {out_path}")
+    print("\nSentinel checkpoint run complete")
+    print(f"Report saved to: {out_path}")
+    print("\nSummary Status:")
     print(json.dumps({"drift": drift["status"], "bias": bias["status"], "adversarial": adv["status"]}, indent=2))
 
 if __name__ == "__main__":

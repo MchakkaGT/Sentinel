@@ -1,4 +1,5 @@
 import json
+import numpy as np
 import os
 from pathlib import Path
 from datetime import datetime
@@ -7,12 +8,22 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, (np.float32, np.float64)):
+            return float(obj)
+        if isinstance(obj, (np.int32, np.int64, np.integer)):
+            return int(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super(NumpyEncoder, self).default(obj)
+
 def write_report(report: Dict[str, Any], out_path: str) -> None:
     """Saves a drift investigation result dictionary to a JSON file."""
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
     report["generated_at"] = datetime.utcnow().isoformat() + "Z"
     with open(out_path, "w", encoding="utf-8") as f:
-        json.dump(report, f, indent=2)
+        json.dump(report, f, indent=2, cls=NumpyEncoder)
 
 def generate_charts(report: Dict[str, Any], out_dir: str, prefix: str = "") -> List[str]:
     """

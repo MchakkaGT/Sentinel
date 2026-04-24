@@ -1,13 +1,20 @@
 import os
 import json
+import sys
 from pathlib import Path
+
+# Add project root to sys.path
+root_dir = Path(__file__).resolve().parent.parent.parent
+if str(root_dir) not in sys.path:
+    sys.path.append(str(root_dir))
+
 from sentinel.api.llm_client import LLMClient
 from sentinel.drift.drift_runner import run_drift
 from sentinel.report.report_builder import write_report, generate_charts, write_consolidated_report
 
 def run_benchmark():
     os.environ["PYTHONPATH"] = os.environ.get("PYTHONPATH", "") + ":."
-    client = LLMClient(model_name="sentinel-llm-v1")
+    client = LLMClient(model_name="google/gemini-2.0-flash-exp:free")
     
     ref_path = "data/benchmarks/ref_balanced.csv"
     cur_files = {

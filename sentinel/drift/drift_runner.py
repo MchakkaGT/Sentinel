@@ -5,6 +5,7 @@ from typing import List, Dict, Any
 import numpy as np
 from scipy import stats
 from sentinel.api.llm_client import LLMClient
+from sentinel.config import SEMANTIC_DRIFT_THRESHOLD, MMD_DRIFT_THRESHOLD, FAMILIARITY_DRIFT_THRESHOLD, P_VALUE_THRESHOLD
 
 def _load_csv(path: str) -> List[Dict[str, Any]]:
     """Loads and parses a CSV file into a list of dictionaries."""
@@ -52,8 +53,12 @@ def run_drift(ref_csv_path: str, cur_csv_path: str, client: LLMClient) -> Dict[s
         return {"status": "error", "message": "Missing reference or current data"}
 
     # Semantic and Distributional Metrics
-    ref_embeddings = np.array([client.embed(r.get("text", "")) for r in ref_rows])
-    cur_embeddings = np.array([client.embed(r.get("text", "")) for r in cur_rows])
+    print("  - Calculating embeddings (Batch)...")
+    ref_texts = [r.get("text", "") for r in ref_rows]
+    cur_texts = [r.get("text", "") for r in cur_rows]
+    
+    ref_embeddings = client.embed_batch(ref_texts)
+    cur_embeddings = client.embed_batch(cur_texts)
     
     centroid_ref = np.mean(ref_embeddings, axis=0)
     centroid_cur = np.mean(cur_embeddings, axis=0)
@@ -61,8 +66,9 @@ def run_drift(ref_csv_path: str, cur_csv_path: str, client: LLMClient) -> Dict[s
     mmd_drift = _calculate_mmd(ref_embeddings, cur_embeddings)
 
     # Statistical Significance (K-S Test)
-    ref_scores: List[float] = [client.score(r.get("text", "")) for r in ref_rows]
-    cur_scores: List[float] = [client.score(r.get("text", "")) for r in cur_rows]
+    print("  - Calculating scores (Batch)...")
+    ref_scores = client.score_batch(ref_texts)
+    cur_scores = client.score_batch(cur_texts)
     ks_stat, ks_p_value = stats.ks_2samp(ref_scores, cur_scores)
 
     # Label Distribution Shift (Chi-Squared Test)
@@ -103,13 +109,13 @@ def run_drift(ref_csv_path: str, cur_csv_path: str, client: LLMClient) -> Dict[s
     familiarity_drift = abs(avg_ref_score - avg_cur_score)
 
     # Drift Categorization
-    novelty_drifted = familiarity_drift > 2.0
-    semantic_drifted = semantic_drift > 0.1 or mmd_drift > 0.05
+    novelty_drifted = familiarity_drift > FAMILIARITY_DRIFT_THRESHOLD
+    semantic_drifted = semantic_drift > SEMANTIC_DRIFT_THRESHOLD or mmd_drift > MMD_DRIFT_THRESHOLD
     
     drift_types = []
     if semantic_drifted:
         drift_types.append("Covariate Shift")
-    if chi2_p_value is not None and chi2_p_value < 0.05:
+    if chi2_p_value is not None and chi2_p_value < P_VALUE_THRESHOLD:
         drift_types.append("Prior Probability Shift")
     if novelty_drifted:
         drift_types.append("Familiarity Drift")
@@ -133,7 +139,11 @@ def run_drift(ref_csv_path: str, cur_csv_path: str, client: LLMClient) -> Dict[s
     }
 
     explanations = {}
-    explanations["ai_narrative"] = client.summarize_drift(res_metrics)
+    try:
+        explanations["ai_narrative"] = client.summarize_drift(res_metrics)
+    except Exception as e:
+        print(f"  - Warning: AI narrative generation failed: {e}")
+        explanations["ai_narrative"] = "AI Narrative unavailable due to API rate limits or connectivity issues."
     
     # Root Cause Identification
     similarities = [_cosine_similarity(centroid_ref, emb) for emb in cur_embeddings]
